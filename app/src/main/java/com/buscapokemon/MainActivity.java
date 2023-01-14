@@ -1,13 +1,21 @@
 package com.buscapokemon;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.ProgressDialog;
+import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -19,14 +27,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+
     Button btnSearch;
+    ImageView imagePokemon;
     TextView txtJson;
-    ProgressDialog pd;
+    TextView habilidades;
+    ProgressBar pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,25 +45,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         btnSearch = findViewById(R.id.btnSearch);
+        imagePokemon = findViewById(R.id.imagePokemon);
         txtJson = findViewById(R.id.txtJson);
+        habilidades = findViewById(R.id.habilidades);
+        pd = findViewById(R.id.progressBar);
 
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/ditto");
-            }
-        });
+        btnSearch.setOnClickListener(v ->
+                new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/pikachu"));
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class JsonTask extends AsyncTask<String, String, String> {
 
         protected void onPreExecute() {
             super.onPreExecute();
-
-            pd = new ProgressDialog(MainActivity.this);
-            pd.setMessage("Please wait");
-            pd.setCancelable(false);
-            pd.show();
+            pd.setVisibility(View.VISIBLE);
         }
 
         protected String doInBackground(String... params) {
@@ -63,24 +70,18 @@ public class MainActivity extends AppCompatActivity {
                 URL url = new URL(params[0]);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
-
-
                 InputStream stream = connection.getInputStream();
-
                 reader = new BufferedReader(new InputStreamReader(stream));
 
-                StringBuffer buffer = new StringBuffer();
-                String line = "";
+                StringBuilder buffer = new StringBuilder();
+                String line;
 
                 while ((line = reader.readLine()) != null) {
-                    buffer.append(line+"\n");
+                    buffer.append(line).append("\n");
                     Log.d("Response: ", "> " + line);   //here u ll get whole response...... :-)
-
                 }
                 return buffer.toString();
 
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -101,18 +102,32 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if (pd.isShowing()){
-                pd.dismiss();
-            }
-
+            pd.setVisibility(View.INVISIBLE);
             String name, weight, height;
+
 
             try {
                 JSONObject jsonObject = new JSONObject(result);
+                LinearLayout lin = findViewById(R.id.linearLayout);
                 name = jsonObject.getString("name");
                 weight = jsonObject.getString("weight");
                 height = jsonObject.getString("height");
+                JSONArray abilities = jsonObject.getJSONArray("abilities");
+
+                for (int i=0; i<abilities.length(); i++){
+                    JSONObject json_obj = abilities.getJSONObject(i);
+                    JSONObject ability = json_obj.getJSONObject("ability");
+                    String name_hab = ability.getString("name");
+                    TextView habView = new TextView(MainActivity.this);
+                    habView.setText(name_hab);
+                    lin.addView(habView);
+
+                }
+
                 txtJson.setText(name + " " + weight + " " + height);
+
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
