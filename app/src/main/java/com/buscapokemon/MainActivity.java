@@ -5,7 +5,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,7 +36,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-
     Button btnSearch;
     ImageView imagePokemon;
     TextView txtJson;
@@ -51,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         pd = findViewById(R.id.progressBar);
 
         btnSearch.setOnClickListener(v ->
-                new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/pikachu"));
+                new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/ditto"));
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -114,6 +117,11 @@ public class MainActivity extends AppCompatActivity {
                 height = jsonObject.getString("height");
                 JSONArray abilities = jsonObject.getJSONArray("abilities");
 
+                JSONObject sprites = jsonObject.getJSONObject("sprites");
+                String sprite = sprites.getString("front_default");
+                Drawable dw = Drawable.createFromPath(sprite);
+                imagePokemon.setBackground(dw);
+//imagePokemon.setBackgroundResource(R.drawable.mom);
                 for (int i=0; i<abilities.length(); i++){
                     JSONObject json_obj = abilities.getJSONObject(i);
                     JSONObject ability = json_obj.getJSONObject("ability");
@@ -121,8 +129,10 @@ public class MainActivity extends AppCompatActivity {
                     TextView habView = new TextView(MainActivity.this);
                     habView.setText(name_hab);
                     lin.addView(habView);
-
                 }
+
+
+
 
                 txtJson.setText(name + " " + weight + " " + height);
 
