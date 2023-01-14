@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 String sprite = sprites.getString("front_default");
                 Drawable dw = Drawable.createFromPath(sprite);
                 imagePokemon.setBackground(dw);
-//imagePokemon.setBackgroundResource(R.drawable.mom);
+
                 for (int i=0; i<abilities.length(); i++){
                     JSONObject json_obj = abilities.getJSONObject(i);
                     JSONObject ability = json_obj.getJSONObject("ability");
