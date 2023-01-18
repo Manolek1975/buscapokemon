@@ -1,24 +1,19 @@
 package com.buscapokemon;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -31,8 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.net.URLConnection;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,11 +49,15 @@ public class MainActivity extends AppCompatActivity {
         habilidades = findViewById(R.id.habilidades);
         pd = findViewById(R.id.progressBar);
 
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+
+        StrictMode.setThreadPolicy(policy);
+
         btnSearch.setOnClickListener(v ->
-                new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/ditto"));
+                new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/pikachu"));
     }
 
-    @SuppressLint("StaticFieldLeak")
+
     private class JsonTask extends AsyncTask<String, String, String> {
 
         protected void onPreExecute() {
@@ -116,13 +116,15 @@ public class MainActivity extends AppCompatActivity {
                 weight = jsonObject.getString("weight");
                 height = jsonObject.getString("height");
                 JSONArray abilities = jsonObject.getJSONArray("abilities");
-
                 JSONObject sprites = jsonObject.getJSONObject("sprites");
-                String sprite = sprites.getString("front_default");
-                Drawable dw = Drawable.createFromPath(sprite);
-                imagePokemon.setBackground(dw);
 
-                for (int i=0; i<abilities.length(); i++){
+                String sprite = sprites.getString("front_default");
+                //URL url = new URL(sprite);
+                //Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(sprite).getContent());
+                imagePokemon.setImageBitmap(bitmap);
+
+                for (int i = 0; i < abilities.length(); i++) {
                     JSONObject json_obj = abilities.getJSONObject(i);
                     JSONObject ability = json_obj.getJSONObject("ability");
                     String name_hab = ability.getString("name");
@@ -130,19 +132,15 @@ public class MainActivity extends AppCompatActivity {
                     habView.setText(name_hab);
                     lin.addView(habView);
                 }
-
-
-
-
                 txtJson.setText(name + " " + weight + " " + height);
-
-
 
             } catch (JSONException e) {
                 e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            //txtJson.setText(result);
         }
     }
 }
