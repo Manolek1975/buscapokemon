@@ -5,13 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -32,10 +35,11 @@ import java.net.URLConnection;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnSearch;
+    ImageButton btnSearch;
     ImageView imagePokemon;
-    TextView txtJson;
-    TextView habilidades;
+    TextView nameView;
+    TextView alturaView;
+    TextView pesoView;
     ProgressBar pd;
 
     @Override
@@ -45,8 +49,9 @@ public class MainActivity extends AppCompatActivity {
 
         btnSearch = findViewById(R.id.btnSearch);
         imagePokemon = findViewById(R.id.imagePokemon);
-        txtJson = findViewById(R.id.txtJson);
-        habilidades = findViewById(R.id.habilidades);
+        nameView = findViewById(R.id.namePoke);
+        pesoView = findViewById(R.id.pesoPoke);
+        alturaView = findViewById(R.id.alturaPoke);
         pd = findViewById(R.id.progressBar);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("StaticFieldLeak")
     private class JsonTask extends AsyncTask<String, String, String> {
 
         protected void onPreExecute() {
@@ -105,39 +111,36 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             pd.setVisibility(View.INVISIBLE);
-            String name, weight, height;
-
+            String name, peso, altura;
 
             try {
                 JSONObject jsonObject = new JSONObject(result);
-                LinearLayout lin = findViewById(R.id.linearLayout);
+                LinearLayout lin = findViewById(R.id.linStats);
                 name = jsonObject.getString("name");
-                weight = jsonObject.getString("weight");
-                height = jsonObject.getString("height");
+                peso = jsonObject.getString("weight");
+                altura = jsonObject.getString("height");
                 JSONArray abilities = jsonObject.getJSONArray("abilities");
                 JSONObject sprites = jsonObject.getJSONObject("sprites");
 
                 String sprite = sprites.getString("front_default");
-                //URL url = new URL(sprite);
-                //Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
                 Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(sprite).getContent());
                 imagePokemon.setImageBitmap(bitmap);
+                nameView.setText(name);
+                pesoView.setText(String.format("Peso:%s", peso));
+                alturaView.setText(String.format("Altura:%s", altura));
 
                 for (int i = 0; i < abilities.length(); i++) {
                     JSONObject json_obj = abilities.getJSONObject(i);
                     JSONObject ability = json_obj.getJSONObject("ability");
                     String name_hab = ability.getString("name");
                     TextView habView = new TextView(MainActivity.this);
+                    habView.setTextColor(Color.WHITE);
                     habView.setText(name_hab);
+                    habView.setGravity(Gravity.CENTER);
                     lin.addView(habView);
                 }
-                txtJson.setText(name + " " + weight + " " + height);
 
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
         }
