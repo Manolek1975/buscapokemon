@@ -11,6 +11,8 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -38,6 +40,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,9 +50,11 @@ public class MainActivity extends AppCompatActivity {
     TextView nameView;
     TextView alturaView;
     TextView pesoView;
+    TextView locationView;
     ProgressBar pd;
     EditText editPokemon;
     String pokemon;
+    String location;
 
 
     @Override
@@ -64,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         nameView = findViewById(R.id.namePoke);
         pesoView = findViewById(R.id.pesoPoke);
         alturaView = findViewById(R.id.alturaPoke);
+
         pd = findViewById(R.id.progressBar);
 
 
@@ -74,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
             hideSoftKeyboard(this);
             pokemon = editPokemon.getText().toString();
             new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/" + pokemon);
+            editPokemon.setText("");
         });
 
     }
@@ -133,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(result);
             pd.setVisibility(View.INVISIBLE);
             errorView.setText("");
-            String name, peso, altura;
+            String name, peso, altura, location;
 
             try {
                 JSONObject jsonObject = new JSONObject(result);
@@ -141,12 +148,10 @@ public class MainActivity extends AppCompatActivity {
                 peso = jsonObject.getString("weight");
                 altura = jsonObject.getString("height");
                 JSONArray abilities = jsonObject.getJSONArray("abilities");
+                JSONArray stats = jsonObject.getJSONArray("stats");
                 JSONObject sprites = jsonObject.getJSONObject("sprites");
 
                 String sprite = sprites.getString("front_default");
-
-                //((ViewManager)lin.getParent()).removeView(lin);
-
                 Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(sprite).getContent());
                 imagePokemon.setImageBitmap(bitmap);
                 nameView.setText(name);
@@ -154,9 +159,13 @@ public class MainActivity extends AppCompatActivity {
                 alturaView.setText(String.format("Altura: %s", altura));
 
                 TextView habText = findViewById(R.id.habilidadesText);
+                TextView statText = findViewById(R.id.statsText);
                 habText.setVisibility(View.VISIBLE);
+                statText.setVisibility(View.VISIBLE);
                 LinearLayout lin = findViewById(R.id.habilidades);
+                LinearLayout lin_stat = findViewById(R.id.stats);
                 lin.removeAllViews();
+                lin_stat.removeAllViews();
 
                 for (int i = 0; i < abilities.length(); i++) {
                     JSONObject json_obj = abilities.getJSONObject(i);
@@ -167,6 +176,17 @@ public class MainActivity extends AppCompatActivity {
                     habView.setText(name_hab);
                     habView.setGravity(Gravity.START);
                     lin.addView(habView);
+                }
+
+                for (int i = 0; i < stats.length(); i++) {
+                    JSONObject json_obj = stats.getJSONObject(i);
+                    JSONObject stat = json_obj.getJSONObject("stat");
+                    String name_stat = stat.getString("name");
+                    TextView statView = new TextView(MainActivity.this);
+                    statView.setTextColor(Color.WHITE);
+                    statView.setText(name_stat);
+                    statView.setGravity(Gravity.START);
+                    lin_stat.addView(statView);
                 }
 
             } catch (JSONException | IOException e) {
