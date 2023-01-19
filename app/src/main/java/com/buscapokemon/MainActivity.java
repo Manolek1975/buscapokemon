@@ -3,6 +3,7 @@ package com.buscapokemon;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -13,7 +14,12 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewManager;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -37,30 +43,40 @@ public class MainActivity extends AppCompatActivity {
 
     ImageButton btnSearch;
     ImageView imagePokemon;
+    TextView errorView;
     TextView nameView;
     TextView alturaView;
     TextView pesoView;
     ProgressBar pd;
+    EditText editPokemon;
+    String pokemon;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        editPokemon = findViewById(R.id.editPokemon);
         btnSearch = findViewById(R.id.btnSearch);
+        errorView = findViewById(R.id.errorPoke);
         imagePokemon = findViewById(R.id.imagePokemon);
         nameView = findViewById(R.id.namePoke);
         pesoView = findViewById(R.id.pesoPoke);
         alturaView = findViewById(R.id.alturaPoke);
         pd = findViewById(R.id.progressBar);
 
+
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        btnSearch.setOnClickListener(v ->
-                new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/pikachu"));
-    }
+        btnSearch.setOnClickListener(view -> {
+            hideSoftKeyboard(this);
+            pokemon = editPokemon.getText().toString();
+            new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/" + pokemon);
+        });
 
+    }
 
     @SuppressLint("StaticFieldLeak")
     private class JsonTask extends AsyncTask<String, String, String> {
@@ -109,13 +125,18 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
+            if (result == null) {
+                errorView.setText(String.format("No existe el pokemon %s", pokemon));
+                pd.setVisibility(View.INVISIBLE);
+                return;
+            }
             super.onPostExecute(result);
             pd.setVisibility(View.INVISIBLE);
+            errorView.setText("");
             String name, peso, altura;
 
             try {
                 JSONObject jsonObject = new JSONObject(result);
-                LinearLayout lin = findViewById(R.id.linStats);
                 name = jsonObject.getString("name");
                 peso = jsonObject.getString("weight");
                 altura = jsonObject.getString("height");
@@ -123,11 +144,19 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject sprites = jsonObject.getJSONObject("sprites");
 
                 String sprite = sprites.getString("front_default");
+
+                //((ViewManager)lin.getParent()).removeView(lin);
+
                 Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(sprite).getContent());
                 imagePokemon.setImageBitmap(bitmap);
                 nameView.setText(name);
-                pesoView.setText(String.format("Peso:%s", peso));
-                alturaView.setText(String.format("Altura:%s", altura));
+                pesoView.setText(String.format("Peso: %s", peso));
+                alturaView.setText(String.format("Altura: %s", altura));
+
+                TextView habText = findViewById(R.id.habilidadesText);
+                habText.setVisibility(View.VISIBLE);
+                LinearLayout lin = findViewById(R.id.habilidades);
+                lin.removeAllViews();
 
                 for (int i = 0; i < abilities.length(); i++) {
                     JSONObject json_obj = abilities.getJSONObject(i);
@@ -136,13 +165,25 @@ public class MainActivity extends AppCompatActivity {
                     TextView habView = new TextView(MainActivity.this);
                     habView.setTextColor(Color.WHITE);
                     habView.setText(name_hab);
-                    habView.setGravity(Gravity.CENTER);
+                    habView.setGravity(Gravity.START);
                     lin.addView(habView);
                 }
 
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if(inputMethodManager.isAcceptingText()){
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(),
+                    0
+            );
         }
     }
 }
