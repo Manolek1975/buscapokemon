@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     TextView pesoView;
     TextView habText;
     TextView statText;
+    TextView itemsText;
     ProgressBar pd;
     EditText editPokemon;
     String pokemon;
@@ -74,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
         pesoView = findViewById(R.id.pesoPoke);
         alturaView = findViewById(R.id.alturaPoke);
         habText = findViewById(R.id.habText);
-        statText = findViewById(R.id.statsText);
+        //statText = findViewById(R.id.statsText);
+        itemsText = findViewById(R.id.itemsText);
 
         pd = findViewById(R.id.progressBar);
 
@@ -147,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(result);
             pd.setVisibility(View.INVISIBLE);
             habText.setVisibility(View.VISIBLE);
-            statText.setVisibility(View.VISIBLE);
+            itemsText.setVisibility(View.VISIBLE);
             errorView.setText("");
 
             Pokemon pokemon = new Pokemon();
@@ -172,7 +174,16 @@ public class MainActivity extends AppCompatActivity {
                 habLin.addView(habView);
             }
 
-
+            LinearLayout itemsLin = findViewById(R.id.stats);
+            itemsLin.removeAllViews();
+            List<String> listItems = pokemon.getForms();
+            for (String item : listItems){
+                TextView statView = new TextView(MainActivity.this);
+                statView.setTextColor(Color.WHITE);
+                statView.setText(item);
+                statView.setGravity(Gravity.START);
+                itemsLin.addView(statView);
+            }
 
 
 /*            try {

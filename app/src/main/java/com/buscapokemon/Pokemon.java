@@ -21,6 +21,8 @@ public class Pokemon implements IPokemon{
     private Bitmap image;
     private List<String> abilities;
     private List<String> stats;
+    private List<String> forms;
+
 
     public Pokemon() {
         super();
@@ -38,6 +40,8 @@ public class Pokemon implements IPokemon{
         pokemon.setHeight(height);
         pokemon.setImage(getJSONImage(json));
         pokemon.setAbilities(getJSONAbilities(json));
+
+        pokemon.setForms(getJSONForms(json));
         return pokemon;
     }
 
@@ -60,14 +64,28 @@ public class Pokemon implements IPokemon{
         //List<Pokemon> pokemon = new ArrayList<>();
         abilities = new ArrayList<>();
         JSONObject jsonObject = new JSONObject(json);
-        JSONArray ab = jsonObject.getJSONArray("abilities");
-        for (int i = 0; i < ab.length(); i++) {
-            JSONObject json_obj = ab.getJSONObject(i);
+        JSONArray js = jsonObject.getJSONArray("abilities");
+        for (int i = 0; i < js.length(); i++) {
+            JSONObject json_obj = js.getJSONObject(i);
             JSONObject ability = json_obj.getJSONObject("ability");
             String name_hab = ability.getString("name");
             abilities.add(name_hab);
         }
         return abilities;
+    }
+
+    @Override
+    public List<String> getJSONForms(String json) throws JSONException {
+        forms = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject(json);
+        JSONArray js = jsonObject.getJSONArray("held_items");
+        for (int i = 0; i < js.length(); i++) {
+            JSONObject json_obj = js.getJSONObject(i);
+            JSONObject form = json_obj.getJSONObject("item");
+            String name_form = form.getString("name");
+            forms.add(name_form);
+        }
+        return forms;
     }
 
 
@@ -117,5 +135,13 @@ public class Pokemon implements IPokemon{
 
     public void setStats(List<String> stats) {
         this.stats = stats;
+    }
+
+    public List<String> getForms() {
+        return forms;
+    }
+
+    public void setForms(List<String> forms) {
+        this.forms = forms;
     }
 }

@@ -125,14 +125,14 @@
                     android:visibility="invisible" />
 
                 <Space
-                    android:layout_width="20dp"
+                    android:layout_width="65dp"
                     android:layout_height="0dp" />
 
                 <TextView
-                    android:id="@+id/statsText"
+                    android:id="@+id/itemsText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/stats_text"
+                    android:text="@string/items_text"
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:visibility="invisible" />
@@ -146,7 +146,7 @@
 
                 <LinearLayout
                     android:id="@+id/habilidades"
-                    android:layout_width="wrap_content"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="50dp"
                     android:layout_gravity="start"

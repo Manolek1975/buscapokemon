@@ -5,5 +5,6 @@
     <string name="image_desc">image_desc</string>
     <string name="habilidades_text"><u>Habilidades</u></string>
     <string name="stats_text"><u>Stats</u></string>
+    <string name="items_text"><u>Items</u></string>
 
 </resources>
