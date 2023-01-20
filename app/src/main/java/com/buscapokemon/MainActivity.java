@@ -1,5 +1,6 @@
 package com.buscapokemon;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -41,6 +42,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
     TextView nameView;
     TextView alturaView;
     TextView pesoView;
-    TextView locationView;
+    TextView habText;
+    TextView statText;
     ProgressBar pd;
     EditText editPokemon;
     String pokemon;
@@ -69,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
         nameView = findViewById(R.id.namePoke);
         pesoView = findViewById(R.id.pesoPoke);
         alturaView = findViewById(R.id.alturaPoke);
+        TextView habText = findViewById(R.id.habilidadesText);
+        TextView statText = findViewById(R.id.statsText);
 
         pd = findViewById(R.id.progressBar);
 
@@ -139,10 +145,36 @@ public class MainActivity extends AppCompatActivity {
             }
             super.onPostExecute(result);
             pd.setVisibility(View.INVISIBLE);
+            habText.setVisibility(View.VISIBLE);
+            statText.setVisibility(View.VISIBLE);
             errorView.setText("");
-            String name, peso, altura, location;
 
+            Pokemon pokemon = new Pokemon();
             try {
+                pokemon = pokemon.getJSON(result);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            nameView.setText(pokemon.getName());
+            pesoView.setText(String.format("Peso: %s", pokemon.getWeight()));
+            alturaView.setText(String.format("Altura: %s", pokemon.getHeight()));
+            imagePokemon.setImageBitmap(pokemon.getImage());
+
+            LinearLayout habLin = findViewById(R.id.habilidades);
+            List<String> listAbilities = pokemon.getAbilities();
+            for (String ability : listAbilities){
+                TextView habView = new TextView(MainActivity.this);
+                habView.setTextColor(Color.WHITE);
+                habView.setText(ability);
+                habView.setGravity(Gravity.START);
+                habLin.addView(habView);
+            }
+
+
+
+
+/*            try {
+
                 JSONObject jsonObject = new JSONObject(result);
                 name = jsonObject.getString("name");
                 peso = jsonObject.getString("weight");
@@ -191,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
 
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
     }
 

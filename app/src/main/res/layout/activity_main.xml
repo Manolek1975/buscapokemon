@@ -62,17 +62,10 @@
                 android:id="@+id/errorPoke"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                android:layout_marginStart="50dp"
+                android:layout_marginStart="55dp"
                 android:layout_gravity="start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/namePoke"
@@ -95,7 +88,7 @@
             <TextView
                 android:id="@+id/pesoPoke"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="16sp"
                 android:layout_marginTop="20dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -103,9 +96,16 @@
             <TextView
                 android:id="@+id/alturaPoke"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="16sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="invisible" />
 
 
             <LinearLayout
