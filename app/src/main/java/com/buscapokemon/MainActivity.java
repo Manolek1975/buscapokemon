@@ -73,8 +73,8 @@ public class MainActivity extends AppCompatActivity {
         nameView = findViewById(R.id.namePoke);
         pesoView = findViewById(R.id.pesoPoke);
         alturaView = findViewById(R.id.alturaPoke);
-        TextView habText = findViewById(R.id.habilidadesText);
-        TextView statText = findViewById(R.id.statsText);
+        habText = findViewById(R.id.habText);
+        statText = findViewById(R.id.statsText);
 
         pd = findViewById(R.id.progressBar);
 
@@ -85,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
         btnSearch.setOnClickListener(view -> {
             hideSoftKeyboard(this);
             pokemon = editPokemon.getText().toString();
-            new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/" + pokemon);
+            if (!pokemon.isEmpty())
+                new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/" + pokemon);
             editPokemon.setText("");
         });
 
@@ -161,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
             imagePokemon.setImageBitmap(pokemon.getImage());
 
             LinearLayout habLin = findViewById(R.id.habilidades);
+            habLin.removeAllViews();
             List<String> listAbilities = pokemon.getAbilities();
             for (String ability : listAbilities){
                 TextView habView = new TextView(MainActivity.this);
