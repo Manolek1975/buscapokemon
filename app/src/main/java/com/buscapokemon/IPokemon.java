@@ -12,6 +12,6 @@ public interface IPokemon {
     Pokemon getJSON(String json) throws JSONException;
     Bitmap getJSONImage(String json) throws JSONException;
     List<String> getJSONAbilities(String json) throws JSONException;
-    List<String> getJSONForms(String json) throws  JSONException;
+    List<String> getJSONItems(String json) throws  JSONException;
 
 }

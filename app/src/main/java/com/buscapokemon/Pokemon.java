@@ -18,10 +18,12 @@ public class Pokemon implements IPokemon{
     private String name;
     private int height;
     private int weight;
+    private String location;
     private Bitmap image;
     private List<String> abilities;
+    private List<String> items;
     private List<String> stats;
-    private List<String> forms;
+
 
 
     public Pokemon() {
@@ -35,13 +37,14 @@ public class Pokemon implements IPokemon{
         name = jsonObject.getString("name");
         weight = Integer.parseInt(jsonObject.getString("weight"));
         height = Integer.parseInt(jsonObject.getString("height"));
+        location = jsonObject.getString("location_area_encounters");
         pokemon.setName(name);
         pokemon.setWeight(weight);
         pokemon.setHeight(height);
+        pokemon.setLocation(location);
         pokemon.setImage(getJSONImage(json));
         pokemon.setAbilities(getJSONAbilities(json));
-
-        pokemon.setForms(getJSONForms(json));
+        pokemon.setItems(getJSONItems(json));
         return pokemon;
     }
 
@@ -75,17 +78,17 @@ public class Pokemon implements IPokemon{
     }
 
     @Override
-    public List<String> getJSONForms(String json) throws JSONException {
-        forms = new ArrayList<>();
+    public List<String> getJSONItems(String json) throws JSONException {
+        items = new ArrayList<>();
         JSONObject jsonObject = new JSONObject(json);
         JSONArray js = jsonObject.getJSONArray("held_items");
         for (int i = 0; i < js.length(); i++) {
             JSONObject json_obj = js.getJSONObject(i);
-            JSONObject form = json_obj.getJSONObject("item");
-            String name_form = form.getString("name");
-            forms.add(name_form);
+            JSONObject item = json_obj.getJSONObject("item");
+            String name_form = item.getString("name");
+            items.add(name_form);
         }
-        return forms;
+        return items;
     }
 
 
@@ -137,11 +140,19 @@ public class Pokemon implements IPokemon{
         this.stats = stats;
     }
 
-    public List<String> getForms() {
-        return forms;
+    public List<String> getItems() {
+        return items;
     }
 
-    public void setForms(List<String> forms) {
-        this.forms = forms;
+    public void setItems(List<String> forms) {
+        this.items = forms;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

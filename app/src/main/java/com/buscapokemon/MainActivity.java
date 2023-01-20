@@ -53,9 +53,10 @@ public class MainActivity extends AppCompatActivity {
     TextView nameView;
     TextView alturaView;
     TextView pesoView;
+    TextView locationPoke;
     TextView habText;
-    TextView statText;
     TextView itemsText;
+    TextView statText;
     ProgressBar pd;
     EditText editPokemon;
     String pokemon;
@@ -74,9 +75,10 @@ public class MainActivity extends AppCompatActivity {
         nameView = findViewById(R.id.namePoke);
         pesoView = findViewById(R.id.pesoPoke);
         alturaView = findViewById(R.id.alturaPoke);
+        locationPoke = findViewById(R.id.locationPoke);
         habText = findViewById(R.id.habText);
-        //statText = findViewById(R.id.statsText);
         itemsText = findViewById(R.id.itemsText);
+        //statText = findViewById(R.id.statsText);
 
         pd = findViewById(R.id.progressBar);
 
@@ -88,8 +90,9 @@ public class MainActivity extends AppCompatActivity {
             hideSoftKeyboard(this);
             pokemon = editPokemon.getText().toString();
             if (!pokemon.isEmpty())
-                new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/" + pokemon);
+                new JsonTask().execute("https://pokeapi.co/api/v2/pokemon/" + pokemon.toLowerCase());
             editPokemon.setText("");
+            errorView.setText("");
         });
 
     }
@@ -163,6 +166,10 @@ public class MainActivity extends AppCompatActivity {
             alturaView.setText(String.format("Altura: %s", pokemon.getHeight()));
             imagePokemon.setImageBitmap(pokemon.getImage());
 
+/*            locationPoke.setClickable(true);
+            locationPoke.setMovementMethod(LinkMovementMethod.getInstance());
+            locationPoke.setText(Html.fromHtml(pokemon.getLocation(), Html.FROM_HTML_MODE_COMPACT));*/
+
             LinearLayout habLin = findViewById(R.id.habilidades);
             habLin.removeAllViews();
             List<String> listAbilities = pokemon.getAbilities();
@@ -174,9 +181,9 @@ public class MainActivity extends AppCompatActivity {
                 habLin.addView(habView);
             }
 
-            LinearLayout itemsLin = findViewById(R.id.stats);
+            LinearLayout itemsLin = findViewById(R.id.items);
             itemsLin.removeAllViews();
-            List<String> listItems = pokemon.getForms();
+            List<String> listItems = pokemon.getItems();
             for (String item : listItems){
                 TextView statView = new TextView(MainActivity.this);
                 statView.setTextColor(Color.WHITE);
